@@ -1,1 +1,1 @@
-# cashr
+Cashr is an application which helps to track spending. Built using Flask in Python, transactions are entered into a MYSQL database through a Vuetify front end. 
