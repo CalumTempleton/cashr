@@ -28,7 +28,8 @@ def get_list_of_transaction():
     return jsonify({'transactions': transactions})
 
 
-# The curl command to test this endpoint is as follows: curl -i -H "Content-Type: application/json" -X POST -d '{"balance": 13.86, "date": "2020/01/31", "description": "pie", "type": "food", "value": 3.33}' http://localhost:5000/add_transactions
+# The curl command to test this endpoint is as follows:
+# curl -i -H "Content-Type: application/json" -X POST -d '{"balance": 13.86, "date": "2020/01/31", "description": "pie", "type": "food", "value": 3.33}' http://localhost:5000/add_transactions
 @app.route('/add_transactions', methods=['POST'])
 def add_transaction_to_list():
     if not request.json or not 'balance' in request.json:

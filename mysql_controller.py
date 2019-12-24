@@ -1,6 +1,4 @@
 import mysql.connector
-import json
-
 
 my_formula = "INSERT INTO transactions (date, description, value, balance, type) VALUES (%s, %s, %s, %s, %s)"
 # Array of tuples
