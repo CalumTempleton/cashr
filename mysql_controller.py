@@ -1,8 +1,14 @@
 import mysql.connector
 
-my_formula = "INSERT INTO transactions (date, description, value, balance, type) VALUES (%s, %s, %s, %s, %s)"
+my_formula = (
+    "INSERT INTO transactions (date, description, value, balance, type) VALUES (%s, %s, %s, %s, %s)"
+)
 # Array of tuples
-transaction_array = [("2020/01/31", "pints", 5.00, 10.00, "Banking"), ("2019/12/31", "food", 5.00, 12.99, "Eating")]
+transaction_array = [
+    ("2020/01/31", "pints", 5.00, 10.00, "Banking"),
+    ("2019/12/31", "food", 5.00, 12.99, "Eating"),
+]
+
 
 # With dates, from csv, I will have to flip them as year goes first, month, day
 
@@ -12,7 +18,7 @@ def connect_to_database():
         host="localhost",
         user="root",
         passwd="root",
-        database="cashr"  # this specifies the database we are using (none of the defaults, our own)
+        database="cashr",  # this specifies the database we are using (none of the defaults, our own)
     )
 
     return mydb
@@ -49,7 +55,8 @@ def create_table():
 
     print("Attempting to create table")
     my_cursor.execute(
-        "CREATE TABLE transactions (date DATE, description VARCHAR(255), value FLOAT, balance FLOAT, type VARCHAR(255))")
+        "CREATE TABLE transactions (date DATE, description VARCHAR(255), value FLOAT, balance FLOAT, type VARCHAR(255))"
+    )
     print("Table created")
 
 
