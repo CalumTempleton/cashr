@@ -1,16 +1,16 @@
-#!flask/bin/python
+# import the Flask class from the flask module
 from flask import Flask, jsonify, request
-
 from mysql_controller import *
 
+# create the application object
 app = Flask(__name__)
+
 """
-"balance": 10.0, 
+      "balance": 10.0, 
       "date": "Fri, 31 Jan 2020 00:00:00 GMT", 
       "description": "pints", 
       "type": "Banking", 
       "value": 5.0
-"""
 
 transactionsl = [
     {
@@ -21,6 +21,7 @@ transactionsl = [
         "value": 12.99,
     }
 ]
+"""
 
 
 # The curl command to test this endpoint is as follows: curl http://localhost:5000/get_transactions

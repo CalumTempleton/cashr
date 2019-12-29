@@ -8,3 +8,6 @@ The categories that transactions can be are:
 - Sports & Leisure
 - Presents & Gifts
 - Other
+
+Notes on error handling:
+- if an error such as "Can't connect to MySQL server on 'localhost:3306' because the target machine actively refused it" appears, open task manager, find the service "MySQL80" and make sure its running.
