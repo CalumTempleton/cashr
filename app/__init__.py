@@ -65,22 +65,17 @@ def create_app(config_name):
         return response
 
     # The curl command to test this endpoint is as follows:
-    # curl -H "Content-Type: application/json" -X POST -d '{"id": 2, "date": "2017-06-15", "balance": 13.86, "category": "food", "description": "pie", "value": 3.33}' http://localhost:5000/add_transaction
+    # curl -H "Content-Type: application/json" -X POST -d '{"date": "2017-06-15", "balance": 13.86, "category": "food", "description": "pie", "value": 3.33}' http://localhost:5000/add_transaction
     @app.route("/add_transaction", methods=["POST"])
     def add_transaction_to_list():
         req = request.get_data()
         my_json = req.decode('utf8').replace("'", '"')
-        # description = request.form.get('description')
-        print("be", file=sys.stderr)
-        print(my_json, file=sys.stderr)
         data = json.loads(my_json)
         date = data['date']
         category = data['category']
         description = data['description']
         balance = data['balance']
         value = data['value']
-        print(description, file=sys.stderr)
-        print("af", file=sys.stderr)
         if description:
             transaction = Transactions(date=date, description=description, category=category, balance=balance, value=value)
             transaction.save()
@@ -92,7 +87,7 @@ def create_app(config_name):
                 'balance': transaction.balance,
                 'value': transaction.value
             })
-            response.status_code = 200
+            response.status_code = 201
             return response
         return 'An error has occurred'
 

@@ -6,22 +6,22 @@ def read_data_from_file():
     with open(data_path, 'r') as f:
         reader = csv.reader(f)
         data = [r for r in reader]
-        data.pop(0)  # remove header
+        data.pop(0)  # Remove headers
 
     return data
 
 
-def format_data_from_file():
+def format_transactions(list_of_transactions):
     formatted_data = [[]]
-    for record in data:
-        # The format of the record is [balance, date, description, type, value]
-        formatted_record = [record[4], record[0], record[2], "TBC", record[3]]
-        formatted_data.append(formatted_record)
-        print(formatted_record)
+    for transaction in list_of_transactions:
+        # The format of the transaction is [balance, date, description, type, value]
+        formatted_transaction = [transaction[4], transaction[0], transaction[2], "TBC", transaction[3]]
+        formatted_data.append(formatted_transaction)
+        print(formatted_transaction)
 
     return formatted_data
 
 
 if __name__ == "__main__":
-    data = read_data_from_file()
-    formatted_data = format_data_from_file()
+    transactions = read_data_from_file()
+    formatted_transactions = format_transactions(transactions)
