@@ -7,11 +7,11 @@ class Transactions(db.Model):
     __tablename__ = 'transactions'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    date = db.Column(db.DateTime)
-    description = db.Column(db.String(255))
+    date = db.Column(db.Date, nullable=False)
+    description = db.Column(db.String(255), nullable=False)
     category = db.Column(db.String(255))
     balance = db.Column(db.Float)
-    value = db.Column(db.Float)
+    value = db.Column(db.Float, nullable=False)
 
     def __init__(self, date, description, category, balance, value):
         # Initialise class
