@@ -10,8 +10,8 @@ class Transactions(db.Model):
     date = db.Column(db.Date, nullable=False)
     description = db.Column(db.String(255), nullable=False)
     category = db.Column(db.String(255))
-    balance = db.Column(db.Float)
-    value = db.Column(db.Float, nullable=False)
+    balance = db.Column(db.Numeric(7, 2))
+    value = db.Column(db.Numeric(7, 2), nullable=False)
 
     def __init__(self, date, description, category, balance, value):
         # Initialise class

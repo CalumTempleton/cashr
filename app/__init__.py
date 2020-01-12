@@ -3,7 +3,10 @@ import sys
 
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
+
+from global_vars import CATEGORIES
 from instance.config import app_config
+from decimal import *
 
 # initialize sql-alchemy
 db = SQLAlchemy()
@@ -34,8 +37,8 @@ def create_app(config_name):
                 "date": transaction.date,
                 "description": transaction.description,
                 "category": transaction.category,
-                "balance": transaction.balance,
-                "value": transaction.value,
+                "balance": float(transaction.balance),
+                "value": float(transaction.value),
             }
             results.append(obj)
         response = jsonify(results)
@@ -71,41 +74,42 @@ def create_app(config_name):
     """
     # The curl command to test this endpoint is as follows:
     curl -H "Content-Type: application/json" -X POST -d '{"date": "2017-06-15", "balance": 13.86, 
-    "category": "food", "description": "pie", "value": 3.33}' http://localhost:5000/add_transaction
+    "category": "Other", "description": "pie", "value": 3.33}' http://localhost:5000/add_transaction
     """
 
     @app.route("/add_transaction", methods=["POST"])
     def add_transaction_to_list():
         data = request.get_json(force=True)
-        date, category, description, balance, value, error = get_json_values(data)
+        date, category, description, balance, value, error_list = get_json_values(data)
 
-        if not error:
+        if True not in error_list:
             transaction = Transactions(
-                date=date, description=description, category=category, balance=balance, value=value
+                date=date, category=category, description=description, balance=balance, value=value
             )
             transaction.save()
             response = jsonify(
                 {
                     "id": transaction.id,
                     "date": transaction.date,
-                    "description": transaction.description,
                     "category": transaction.category,
-                    "balance": transaction.balance,
-                    "value": transaction.value,
+                    "description": transaction.description,
+                    "balance": float(transaction.balance),  # Decimals not serializable
+                    "value": float(transaction.value),
                 }
             )
-            print("inside", file=sys.stderr)
             response.status_code = 201
             return response
 
         response = jsonify(
             {
-                "error": "Invalid data entry!",
+                "error": "Invalid data entry! date: {}, category: {}, description: {}, balance: {}, value: {}".format(
+                    error_list[0], error_list[1], error_list[2], error_list[3], error_list[4]
+                ),
                 "date": date,
-                "description": description,
                 "category": category,
-                "balance": balance,
-                "value": value,
+                "description": description,
+                "balance": float(balance),
+                "value": float(value),
             }
         )
         response.status_code = 400
@@ -114,7 +118,6 @@ def create_app(config_name):
     def get_json_values(
         data,
     ):  # move to helper class - also look at valid values for dates and floats
-        error = False
         keys = ["date", "category", "description", "balance", "value"]
         values = []
         for key in keys:
@@ -127,15 +130,14 @@ def create_app(config_name):
                 values.append(data[key])
 
         date, date_error = verify_date(values[0])
-        category = verify_category(values[1])
-        description = verify_description(values[2])
-        balance = verify_balance(values[3])
-        value = verify_value(values[4])
+        category, category_error = verify_category(values[1])
+        description, description_error = verify_description(values[2])
+        balance, balance_error = verify_monetary_values(values[3])
+        value, value_error = verify_monetary_values(values[4])
 
-        if date_error:
-            error = True
+        error_list = [date_error, category_error, description_error, balance_error, value_error]
 
-        return date, category, description, balance, value, error
+        return date, category, description, balance, value, error_list
 
     def verify_date(date):
         error = False
@@ -148,16 +150,29 @@ def create_app(config_name):
         return date, error
 
     def verify_category(category):
-        return category
+        error = False
+        if category not in CATEGORIES:
+            error = True
+        return category, error
 
     def verify_description(description):
-        return description
+        error = False
+        if len(description) >= 250:
+            error = True
+        return description, error
 
-    def verify_balance(balance):
-        return balance
+    # Note that there is no check for leading 0s as JSON does not handle this
+    def verify_monetary_values(value):
+        error = False
+        try:
+            value = Decimal(value)
+            value = round(value, 2)
+            if not isinstance(value, Decimal) or value > 10000.00:
+                error = True
+        except:
+            error = True
 
-    def verify_value(value):
-        return value
+        return value, error
 
     def make_error(status_code, message):
         response = jsonify({"status": status_code, "message": message})

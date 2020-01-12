@@ -28,7 +28,7 @@ class TransactionsTestCase(unittest.TestCase):
             {
                 "date": "2013-11-14",
                 "balance": 100.88,
-                "category": "beer",
+                "category": "Alcohol",
                 "description": "dark fruit",
                 "value": 2.90,
             }
@@ -36,12 +36,12 @@ class TransactionsTestCase(unittest.TestCase):
 
         res = self.client().post("/add_transaction", data=transaction, headers=HEADERS)
         self.assertEqual(res.status_code, 201)
-        result_as_string = str(res.data)
-        self.assertIn("Thu, 14 Nov 2013", result_as_string)  # date formatting issue
-        self.assertIn("100.88", result_as_string)
-        self.assertIn("beer", result_as_string)
-        self.assertIn("dark fruit", result_as_string)
-        self.assertIn("2.9", result_as_string)  # float rounding issue with zero
+        result_data = str(res.data)
+        self.assertIn("14 Nov 2013", result_data)  # date formatting issue
+        self.assertIn("100.88", result_data)
+        self.assertIn("Alcohol", result_data)
+        self.assertIn("dark fruit", result_data)
+        self.assertIn("2.9", result_data)  # Missing trailing zero, either string or client side
 
     def test_api_can_get_all_transactions(self):
         """Test API can get a transaction (GET request)."""
@@ -49,8 +49,8 @@ class TransactionsTestCase(unittest.TestCase):
             {
                 "date": "2013-11-14",
                 "balance": 100.88,
-                "category": "beer",
-                "description": "dark fruit",
+                "category": "Alcohol",
+                "description": "Dark fruits",
                 "value": 2.90,
             }
         )
@@ -58,7 +58,7 @@ class TransactionsTestCase(unittest.TestCase):
             {
                 "date": "2019-01-31",
                 "balance": 10.44,
-                "category": "food",
+                "category": "Food and Juice",
                 "description": "Weekly shop",
                 "value": 23.50,
             }
@@ -72,9 +72,9 @@ class TransactionsTestCase(unittest.TestCase):
 
         res = self.client().get("/get_transactions")
         self.assertEqual(res.status_code, 200)
-        result_as_string = str(res.data)
-        self.assertIn("dark fruit", result_as_string)
-        self.assertIn("Weekly shop", result_as_string)
+        result_data = str(res.data)
+        self.assertIn("Dark fruits", result_data)
+        self.assertIn("Weekly shop", result_data)
 
     def test_post_transaction_with_invalid_date(self):
         """Test API handles a transaction with incorrect date format"""
@@ -82,14 +82,115 @@ class TransactionsTestCase(unittest.TestCase):
             {
                 "date": "Thu, 14 Nov 2013",
                 "balance": 100.88,
-                "category": "beer",
+                "category": "Alcohol",
                 "description": "dark fruit",
                 "value": 2.90,
             }
         )
         res = self.client().post("/add_transaction", data=transaction, headers=HEADERS)
         self.assertEqual(res.status_code, 400)
-        self.assertIn("beer", str(res.data))
+        result_data = str(res.data)
+        self.assertIn("date: True", result_data)
+        self.assertIn("category: False", result_data)
+        self.assertIn("description: False", result_data)
+        self.assertIn("balance: False", result_data)
+        self.assertIn("value: False", result_data)
+
+        transaction = json.dumps(
+            {
+                "date": "01-01-2019",
+                "balance": 100.88,
+                "category": "Alcohol",
+                "description": "dark fruit",
+                "value": 2.90,
+            }
+        )
+        res = self.client().post("/add_transaction", data=transaction, headers=HEADERS)
+        self.assertEqual(res.status_code, 400)
+        result_data = str(res.data)
+        self.assertIn("date: True", result_data)
+        self.assertIn("category: False", result_data)
+        self.assertIn("description: False", result_data)
+        self.assertIn("balance: False", result_data)
+        self.assertIn("value: False", result_data)
+
+    def test_post_transaction_with_invalid_category(self):
+        """Test API handles a transaction with an invalid category"""
+        transaction = json.dumps(
+            {
+                "date": "2019-01-01",
+                "balance": 100.88,
+                "category": "Invalid Category",
+                "description": "dark fruit",
+                "value": 2.90,
+            }
+        )
+        res = self.client().post("/add_transaction", data=transaction, headers=HEADERS)
+        self.assertEqual(res.status_code, 400)
+        result_data = str(res.data)
+        self.assertIn("date: False", result_data)
+        self.assertIn("category: True", result_data)
+        self.assertIn("description: False", result_data)
+        self.assertIn("balance: False", result_data)
+        self.assertIn("value: False", result_data)
+
+    def test_post_transaction_with_invalid_description(self):
+        """Test API handles a transaction with an invalid description"""
+        transaction = json.dumps(
+            {
+                "date": "2019-01-01",
+                "balance": 100.88,
+                "category": "Other",
+                "description": "This is a really long description that will exceed the character limit. The character limited was added in to make sure the description does not exceed VARCHAR255 which is a good idea. Without this check, the database not accept the data, therefore causing the software to crash. Note the character limit has been set to 250 to be on the safe side.",
+                "value": 2.90,
+            }
+        )
+        res = self.client().post("/add_transaction", data=transaction, headers=HEADERS)
+        self.assertEqual(res.status_code, 400)
+        result_data = str(res.data)
+        self.assertIn("date: False", result_data)
+        self.assertIn("category: False", result_data)
+        self.assertIn("description: True", result_data)
+        self.assertIn("balance: False", result_data)
+        self.assertIn("value: False", result_data)
+
+    def test_post_transaction_with_invalid_balance_and_values(self):
+        """Test API handles a transaction with varying balance value. Note that it is difficult
+        to make this test fail and that balance and value use the same verification function."""
+        transaction = json.dumps(
+            {
+                "date": "2019-01-01",
+                "balance": 0.8,
+                "category": "Other",
+                "description": "Tickets to Bermuda!",
+                "value": 0.9,
+            }
+        )
+        res = self.client().post("/add_transaction", data=transaction, headers=HEADERS)
+        self.assertEqual(res.status_code, 201)
+        result_data = str(res.data)
+        self.assertIn('"balance": 0.8', result_data)
+        self.assertIn('"value": 0.9', result_data)
+
+        transaction = json.dumps(
+            {
+                "date": "2019-01-01",
+                "balance": 10001.11111111111,
+                "category": "Other",
+                "description": "Tickets to Bermuda!",
+                "value": 122226.905,
+            }
+        )
+        res = self.client().post("/add_transaction", data=transaction, headers=HEADERS)
+        self.assertEqual(res.status_code, 400)
+        result_data = str(res.data)
+        self.assertIn("date: False", result_data)
+        self.assertIn("category: False", result_data)
+        self.assertIn("description: False", result_data)
+        self.assertIn("balance: True", result_data)
+        self.assertIn("value: True", result_data)
+        self.assertIn('"balance": 10001.11', result_data)
+        self.assertIn('"value": 122226.9', result_data)
 
     def tearDown(self):
         """teardown all initialized variables."""
