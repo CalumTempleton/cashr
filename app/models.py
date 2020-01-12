@@ -4,7 +4,7 @@ from app import db
 class Transactions(db.Model):
     """This class represents the transactions table."""
 
-    __tablename__ = 'transactions'
+    __tablename__ = "transactions"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     date = db.Column(db.Date, nullable=False)

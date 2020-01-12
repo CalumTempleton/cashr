@@ -14,8 +14,8 @@ def create_app(config_name):
 
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_object(app_config[config_name])
-    app.config.from_pyfile('config.py')
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config.from_pyfile("config.py")
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db.init_app(app)
 
     @app.route("/")
@@ -30,12 +30,12 @@ def create_app(config_name):
 
         for transaction in transactions:
             obj = {
-                'id': transaction.id,
-                'date': transaction.date,
-                'description': transaction.description,
-                'category': transaction.category,
-                'balance': transaction.balance,
-                'value': transaction.value
+                "id": transaction.id,
+                "date": transaction.date,
+                "description": transaction.description,
+                "category": transaction.category,
+                "balance": transaction.balance,
+                "value": transaction.value,
             }
             results.append(obj)
         response = jsonify(results)
@@ -50,18 +50,18 @@ def create_app(config_name):
     @app.route("/query_transactions", methods=["GET"])
     def query_list_of_transaction():
         # This needs a null consideration and update by guide which has been faved on laptop
-        description = request.args.get('description')  # This will need to be adapted for front end
+        description = request.args.get("description")  # This will need to be adapted for front end
         transactions = Transactions.query_by(description)
         results = []
 
         for transaction in transactions:
             obj = {
-                'id': transaction.id,
-                'date': transaction.date,
-                'description': transaction.description,
-                'category': transaction.category,
-                'balance': transaction.balance,
-                'value': transaction.value
+                "id": transaction.id,
+                "date": transaction.date,
+                "description": transaction.description,
+                "category": transaction.category,
+                "balance": transaction.balance,
+                "value": transaction.value,
             }
             results.append(obj)
         response = jsonify(results)
@@ -81,37 +81,39 @@ def create_app(config_name):
 
         if not error:
             transaction = Transactions(
-                date=date,
-                description=description,
-                category=category,
-                balance=balance,
-                value=value)
+                date=date, description=description, category=category, balance=balance, value=value
+            )
             transaction.save()
-            response = jsonify({
-                'id': transaction.id,
-                'date': transaction.date,
-                'description': transaction.description,
-                'category': transaction.category,
-                'balance': transaction.balance,
-                'value': transaction.value
-            })
+            response = jsonify(
+                {
+                    "id": transaction.id,
+                    "date": transaction.date,
+                    "description": transaction.description,
+                    "category": transaction.category,
+                    "balance": transaction.balance,
+                    "value": transaction.value,
+                }
+            )
             print("inside", file=sys.stderr)
             response.status_code = 201
             return response
 
-        response = jsonify({
-            'error': 'Invalid data entry!',
-            'date': date,
-            'description': description,
-            'category': category,
-            'balance': balance,
-            'value': value
-        })
+        response = jsonify(
+            {
+                "error": "Invalid data entry!",
+                "date": date,
+                "description": description,
+                "category": category,
+                "balance": balance,
+                "value": value,
+            }
+        )
         response.status_code = 400
         return response
 
     def get_json_values(
-            data):  # move to helper class - also look at valid values for dates and floats
+        data,
+    ):  # move to helper class - also look at valid values for dates and floats
         error = False
         keys = ["date", "category", "description", "balance", "value"]
         values = []
@@ -138,7 +140,7 @@ def create_app(config_name):
     def verify_date(date):
         error = False
         try:
-            datetime.datetime.strptime(date, '%Y-%m-%d')
+            datetime.datetime.strptime(date, "%Y-%m-%d")
         except:
             error = True
             make_error(400, "Error! Date out of range. Transactions from 2019 onward only.")
@@ -158,10 +160,7 @@ def create_app(config_name):
         return value
 
     def make_error(status_code, message):
-        response = jsonify({
-            'status': status_code,
-            'message': message
-        })
+        response = jsonify({"status": status_code, "message": message})
         response.status_code = status_code
         return response
 
