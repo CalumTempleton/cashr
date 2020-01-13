@@ -7,6 +7,8 @@ The categories that transactions can be are:
 - Travel
 - Sports & Leisure
 - Presents & Gifts
+- Flat
+- Utilities
 - Other
 
 Notes on error handling:

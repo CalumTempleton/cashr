@@ -9,3 +9,6 @@ CATEGORIES = [
     "Utilities",
     "Other",
 ]
+
+COLUMN_KEYS = ["date", "category", "description", "balance", "value"]
+HEADERS = {"Content-Type": "application/json", "Accept": "application/json"}
