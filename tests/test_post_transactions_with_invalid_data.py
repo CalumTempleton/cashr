@@ -5,8 +5,8 @@ from app import create_app, db
 from global_vars import *
 
 
-class TestEndpoints(unittest.TestCase):
-    """This class tests endpoints with valid data"""
+class TestPostTransactionsWithInvalidData(unittest.TestCase):
+    """This class tests the post transactions with invalid data"""
 
     def setUp(self):
         """Define test variables and initialize app."""

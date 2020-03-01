@@ -34,8 +34,9 @@ class Transactions(db.Model):
         db.session.commit()
 
     @staticmethod
-    def query_by(description):
-        return Transactions.query.filter_by(description=description).all()
+    def query_by(filter_dict):
+        # Not sure what actually happens if no value is passed...
+        return Transactions.query.filter_by(**filter_dict).all()
 
     def __repr__(self):
         return "<Transactions: {}>".format(self.description)
