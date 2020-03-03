@@ -64,6 +64,7 @@ def create_app(config_name):
         }
 
         filter_by_dict = {}
+        c = ""
 
         for key, val in validation.items():
             for domain in val:
@@ -77,8 +78,22 @@ def create_app(config_name):
                         return response
                     elif not error:
                         filter_by_dict[column] = returned_val
+                        c = column
 
         queried_transactions = Transactions.query_by(filter_by_dict)
+
+        if len(queried_transactions) == 0:
+            val = filter_by_dict[c]
+            if isinstance(val, Decimal):
+                response = jsonify(
+                    {"Data issue. No transactions matching query for {} ".format(c): float(val)}
+                )
+            else:
+                response = jsonify(
+                    {"Data issue. No transactions matching query for {} ".format(c): val}
+                )
+            response.status_code = 200
+            return response
 
         results = []
         for transaction in queried_transactions:

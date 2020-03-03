@@ -19,7 +19,6 @@ class TestPostTransactionsWithInvalidData(unittest.TestCase):
             db.create_all()
 
     def test_post_transaction_with_invalid_date(self):
-        """Test API handles a transaction with incorrect date format"""
         transaction = json.dumps(
             {
                 "date": "Thu, 14 Nov 2013",
@@ -57,7 +56,6 @@ class TestPostTransactionsWithInvalidData(unittest.TestCase):
         self.assertIn("value: False", result_data)
 
     def test_post_transaction_with_invalid_category(self):
-        """Test API handles a transaction with an invalid category"""
         transaction = json.dumps(
             {
                 "date": "2019-01-01",
@@ -77,7 +75,6 @@ class TestPostTransactionsWithInvalidData(unittest.TestCase):
         self.assertIn("value: False", result_data)
 
     def test_post_transaction_with_invalid_description(self):
-        """Test API handles a transaction with an invalid description"""
         transaction = json.dumps(
             {
                 "date": "2019-01-01",

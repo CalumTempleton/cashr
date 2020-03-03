@@ -5,7 +5,7 @@ from app import create_app, db
 from global_vars import *
 
 
-class TestQueryTransactionsWithInvalidData(unittest.TestCase):
+class TestQueryTransactionsWhereNothingFound(unittest.TestCase):
     def setUp(self):
         """Define test variables and initialize app."""
         self.app = create_app(config_name="testing")
@@ -16,7 +16,7 @@ class TestQueryTransactionsWithInvalidData(unittest.TestCase):
             # create all tables
             db.create_all()
 
-    def test_query_transaction_with_invalid_date(self):
+    def test_query_transaction_where_date_not_found(self):
         transaction = json.dumps(
             {
                 "date": "2019-02-28",
@@ -29,12 +29,12 @@ class TestQueryTransactionsWithInvalidData(unittest.TestCase):
         res = self.client().post("/add_transaction", data=transaction, headers=HEADERS)
         self.assertEqual(res.status_code, 201)
 
-        res = self.client().get("/query_transactions?date=Today")
-        self.assertEqual(res.status_code, 400)
+        res = self.client().get("/query_transactions?date=2019-02-18")
+        self.assertEqual(res.status_code, 200)
         result_data = str(res.data)
-        self.assertIn("Today", result_data)
+        self.assertIn("2019-02-18", result_data)
 
-    def test_query_transaction_with_invalid_category(self):
+    def test_query_transaction_where_category_not_found(self):
         transaction = json.dumps(
             {
                 "date": "2019-02-28",
@@ -47,12 +47,12 @@ class TestQueryTransactionsWithInvalidData(unittest.TestCase):
         res = self.client().post("/add_transaction", data=transaction, headers=HEADERS)
         self.assertEqual(res.status_code, 201)
 
-        res = self.client().get("/query_transactions?category=Booze")
-        self.assertEqual(res.status_code, 400)
+        res = self.client().get("/query_transactions?category=Flat")
+        self.assertEqual(res.status_code, 200)
         result_data = str(res.data)
-        self.assertIn("Booze", result_data)
+        self.assertIn("Flat", result_data)
 
-    def test_query_transaction_with_invalid_description(self):
+    def test_query_transaction_where_description_not_found(self):
         transaction = json.dumps(
             {
                 "date": "2019-02-28",
@@ -65,12 +65,12 @@ class TestQueryTransactionsWithInvalidData(unittest.TestCase):
         res = self.client().post("/add_transaction", data=transaction, headers=HEADERS)
         self.assertEqual(res.status_code, 201)
 
-        res = self.client().get("/query_transactions?description=This is a really long description that will exceed the character limit. The character limited was added in to make sure the description does not exceed VARCHAR255 which is a good idea. Without this check, the database not accept the data, therefore causing the software to crash. Note the character limit has been set to 250 to be on the safe side.")
-        self.assertEqual(res.status_code, 400)
+        res = self.client().get("/query_transactions?description=stella")
+        self.assertEqual(res.status_code, 200)
         result_data = str(res.data)
-        self.assertIn("This is a really long description", result_data)
+        self.assertIn("stella", result_data)
 
-    def test_query_transaction_with_invalid_balance_and_values(self):
+    def test_query_transaction_where_balance_and_values_not_found(self):
         transaction = json.dumps(
             {
                 "date": "2019-02-28",
@@ -83,15 +83,15 @@ class TestQueryTransactionsWithInvalidData(unittest.TestCase):
         res = self.client().post("/add_transaction", data=transaction, headers=HEADERS)
         self.assertEqual(res.status_code, 201)
 
-        res = self.client().get("/query_transactions?balance=nothing")
-        self.assertEqual(res.status_code, 400)
+        res = self.client().get("/query_transactions?balance=100.87")
+        self.assertEqual(res.status_code, 200)
         result_data = str(res.data)
-        self.assertIn("nothing", result_data)
+        self.assertIn("100.87", result_data)
 
-        res = self.client().get("/query_transactions?value=ten")
-        self.assertEqual(res.status_code, 400)
+        res = self.client().get("/query_transactions?value=290.00")
+        self.assertEqual(res.status_code, 200)
         result_data = str(res.data)
-        self.assertIn("ten", result_data)
+        self.assertIn("290.0", result_data)
 
     def tearDown(self):
         """teardown all initialized variables."""

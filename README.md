@@ -9,6 +9,7 @@ The categories that transactions can be are:
 - Presents & Gifts
 - Flat
 - Utilities
+- Holiday
 - Other
 
 Notes on error handling:
@@ -16,3 +17,4 @@ Notes on error handling:
 
 Things to add:
 - Pigar for automating requirements file.
+- Querying multiple columns at once
