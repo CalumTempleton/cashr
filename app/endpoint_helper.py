@@ -1,6 +1,5 @@
 import datetime
 from decimal import *
-from flask import jsonify
 
 from global_vars import CATEGORIES
 

@@ -110,6 +110,47 @@ class TestAllEndpointsWithValidData(unittest.TestCase):
         self.assertNotIn("Weekly shop", result_data)
         self.assertNotIn("23.5", result_data)
 
+    def test_delete_transactions_with_valid_data(self):
+        transaction_one = json.dumps(
+            {
+                "date": "2013-11-14",
+                "balance": 100.88,
+                "category": "Alcohol",
+                "description": "Dark fruits",
+                "value": 2.90,
+            }
+        )
+        transaction_two = json.dumps(
+            {
+                "date": "2019-01-31",
+                "balance": 10.44,
+                "category": "Food & juice",
+                "description": "Weekly shop",
+                "value": 23.50,
+            }
+        )
+
+        res_one = self.client().post("/add_transaction", data=transaction_one, headers=HEADERS)
+        self.assertEqual(res_one.status_code, 201)
+
+        res_two = self.client().post("/add_transaction", data=transaction_two, headers=HEADERS)
+        self.assertEqual(res_two.status_code, 201)
+
+        res = self.client().get("/get_transactions")
+        self.assertEqual(res.status_code, 200)
+        result_data = str(res.data)
+        self.assertIn("Dark fruits", result_data)
+        self.assertIn("Weekly shop", result_data)
+
+        del_one = self.client().delete("/delete_transaction/1", headers=HEADERS)
+        self.assertEqual(del_one.status_code, 200)
+
+        res = self.client().get("/get_transactions")
+        self.assertEqual(res.status_code, 200)
+        result_data = str(res.data)
+        self.assertNotIn("Dark fruits", result_data)
+        self.assertIn("Weekly shop", result_data)
+
     def tearDown(self):
         """teardown all initialized variables."""
         with self.app.app_context():

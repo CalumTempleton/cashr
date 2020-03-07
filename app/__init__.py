@@ -152,4 +152,17 @@ def create_app(config_name):
         response.status_code = 400
         return response
 
+    @app.route("/delete_transaction/<int:id>", methods=["DELETE"])
+    def delete_transaction(id):
+        transaction = Transactions.query.filter_by(id=id).first()
+        if not transaction:
+            response = jsonify({"error": "Cannot find transaction with ID of {}".format(id)})
+            response.status_code = 404
+            return response
+
+        transaction.delete()
+        response = jsonify({"success": "Transaction with ID {} successfully delete".format(id)})
+        response.status_code = 200
+        return response
+
     return app

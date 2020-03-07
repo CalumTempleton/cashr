@@ -18,3 +18,4 @@ Notes on error handling:
 Things to add:
 - Pigar for automating requirements file.
 - Querying multiple columns at once
+- Checking if the database is up and running/connect. Created an endpoint

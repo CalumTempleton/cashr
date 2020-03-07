@@ -6,8 +6,6 @@ from global_vars import *
 
 
 class TestPostTransactionsWithInvalidData(unittest.TestCase):
-    """This class tests the post transactions with invalid data"""
-
     def setUp(self):
         """Define test variables and initialize app."""
         self.app = create_app(config_name="testing")
