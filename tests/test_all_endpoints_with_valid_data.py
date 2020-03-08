@@ -151,6 +151,55 @@ class TestAllEndpointsWithValidData(unittest.TestCase):
         self.assertNotIn("Dark fruits", result_data)
         self.assertIn("Weekly shop", result_data)
 
+    def test_update_transaction_with_valid_data(self):
+        transaction = json.dumps(
+            {
+                "date": "2013-11-14",
+                "balance": 100.88,
+                "category": "Alcohol",
+                "description": "Dark fruits",
+                "value": 2.90,
+            }
+        )
+        updated_transaction = json.dumps(
+            {
+                "date": "2013-11-15",
+                "balance": 13.33,
+                "category": "Other",
+                "description": "Strongbow dark fruits",
+                "value": 3.90,
+            }
+        )
+
+        res = self.client().post("/add_transaction", data=transaction, headers=HEADERS)
+        self.assertEqual(res.status_code, 201)
+
+        res = self.client().get("/get_transactions")
+        self.assertEqual(res.status_code, 200)
+        result_data = str(res.data)
+        self.assertIn("Dark fruits", result_data)
+        self.assertIn("1", result_data)  # id
+
+        res = self.client().put("/update_transaction/1", data=updated_transaction, headers=HEADERS)
+        self.assertEqual(res.status_code, 200)
+
+        transactions = self.client().get("/get_transactions")
+        self.assertEqual(transactions.status_code, 200)
+        transactions_data = str(transactions.data)
+        self.assertNotIn("14 Nov", transactions_data)
+        self.assertIn("15 Nov", transactions_data)
+        self.assertNotIn("Alcohol", transactions_data)
+        self.assertIn("Other", transactions_data)
+        self.assertNotIn("Dark fruits", transactions_data)
+        self.assertIn("Strongbow dark fruits", transactions_data)
+        self.assertNotIn("100.88", transactions_data)
+        self.assertIn("13.33", transactions_data)
+        self.assertNotIn("2.9", transactions_data)
+        self.assertIn("3.9", transactions_data)
+
+        # TODO - add in a check to make sure only one transaction exists here as unsure about
+        # the affect of cached json here
+
     def tearDown(self):
         """teardown all initialized variables."""
         with self.app.app_context():

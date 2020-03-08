@@ -5,6 +5,8 @@ import tests.test_all_endpoints_with_valid_data as test_endpoints
 import tests.test_post_transactions_with_invalid_data as test_post_transactions_with_invalid_data
 import tests.test_query_transactions_with_invalid_data as test_query_transactions_with_invalid_data
 import tests.test_query_transactions_where_nothing_found as test_query_transactions_where_nothing_found
+import tests.test_delete_transaction_with_invalid_data as test_delete_transaction_with_invalid_data
+import tests.test_update_transaction_with_invalid_data as test_update_transaction_with_invalid_data
 
 loader = unittest.TestLoader()
 suite = unittest.TestSuite()
@@ -13,6 +15,8 @@ suite.addTests(loader.loadTestsFromModule(test_endpoints))
 suite.addTests(loader.loadTestsFromModule(test_post_transactions_with_invalid_data))
 suite.addTests(loader.loadTestsFromModule(test_query_transactions_with_invalid_data))
 suite.addTests(loader.loadTestsFromModule(test_query_transactions_where_nothing_found))
+suite.addTests(loader.loadTestsFromModule(test_delete_transaction_with_invalid_data))
+suite.addTests(loader.loadTestsFromModule(test_update_transaction_with_invalid_data))
 
 runner = unittest.TextTestRunner(verbosity=3)
 result = runner.run(suite)

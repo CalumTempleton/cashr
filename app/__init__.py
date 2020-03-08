@@ -165,4 +165,111 @@ def create_app(config_name):
         response.status_code = 200
         return response
 
+    @app.route("/update_transaction/<int:id>", methods=["PUT"])
+    def update_transaction(id):
+        data = request.get_json(force=True)
+        (
+            new_date,
+            new_category,
+            new_description,
+            new_balance,
+            new_value,
+            error_list,
+        ) = get_json_values(data)
+
+        transaction = Transactions.query.filter_by(id=id).first()
+        if not transaction:
+            response = jsonify({"error": "Cannot find transaction with ID of {}".format(id)})
+            response.status_code = 404
+            return response
+
+        if True in error_list:
+            response = jsonify(
+                {
+                    "error": "Invalid data entry! date: {}, category: {}, description: {}, balance: {}, value: {}".format(
+                        error_list[0], error_list[1], error_list[2], error_list[3], error_list[4]
+                    ),
+                    "date": new_date,
+                    "category": new_category,
+                    "description": new_description,
+                    "balance": str(new_balance),  # strs as might not be floats
+                    "value": str(new_value),
+                }
+            )
+            response.status_code = 400
+            return response
+
+        date_change = False
+        category_change = False
+        description_change = False
+        balance_change = False
+        value_change = False
+
+        if not error_list[0]:
+            if str(transaction.date) != new_date:
+                transaction.date = new_date
+                date_change = True
+
+        if not error_list[1]:
+            if transaction.category != new_category:
+                transaction.category = new_category
+                category_change = True
+
+        if not error_list[2]:
+            if transaction.description != new_description:
+                transaction.description = new_description
+                description_change = True
+
+        if not error_list[3]:
+            if transaction.balance != new_balance:
+                transaction.balance = new_balance
+                balance_change = True
+
+        if not error_list[4]:
+            if transaction.value != new_value:
+                transaction.value = new_value
+                value_change = True
+
+        if (
+            not date_change
+            and not category_change
+            and not description_change
+            and not balance_change
+            and not value_change
+        ):
+            # Nothing has changed, no need to update transaction
+            response = jsonify(
+                {
+                    "success": "Request valid but transaction not updated due to no change in data",
+                    "date": transaction.date,
+                    "category": transaction.category,
+                    "description": transaction.description,
+                    "balance": float(transaction.balance),
+                    "value": float(transaction.value),
+                }
+            )
+            response.status_code = 200
+            return response
+        else:
+            transaction.save()
+
+            response = jsonify(
+                {
+                    "success": "Transaction has been updated! Update to: date: {}, category: {}, description: {}, balance: {}, value: {}".format(
+                        date_change,
+                        category_change,
+                        description_change,
+                        balance_change,
+                        value_change,
+                    ),
+                    "date": transaction.date,
+                    "category": transaction.category,
+                    "description": transaction.description,
+                    "balance": float(transaction.balance),
+                    "value": float(transaction.value),
+                }
+            )
+            response.status_code = 200
+            return response
+
     return app

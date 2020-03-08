@@ -65,12 +65,10 @@ class TestQueryTransactionsWithInvalidData(unittest.TestCase):
         res = self.client().post("/add_transaction", data=transaction, headers=HEADERS)
         self.assertEqual(res.status_code, 201)
 
-        res = self.client().get(
-            "/query_transactions?description=This is a really long description that will exceed the character limit. The character limited was added in to make sure the description does not exceed VARCHAR255 which is a good idea. Without this check, the database not accept the data, therefore causing the software to crash. Note the character limit has been set to 250 to be on the safe side."
-        )
+        res = self.client().get("/query_transactions?description={}".format(LONG_DESCRIPTION))
         self.assertEqual(res.status_code, 400)
         result_data = str(res.data)
-        self.assertIn("This is a really long description", result_data)
+        self.assertIn(LONG_DESCRIPTION, result_data)
 
     def test_query_transaction_with_invalid_balance_and_values(self):
         transaction = json.dumps(

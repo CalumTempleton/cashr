@@ -34,6 +34,14 @@ def is_none(val):
         return False
 
 
+def get_id(data):
+    if "id" in data:
+        x = data["id"]
+        return x
+    else:
+        return None
+
+
 def verify_id(id):
     if is_none(id):
         return None, True
